@@ -116,9 +116,10 @@ def createRooms():
     r1.addExit("south", r3)
     # add grabbables to room 1
     r1.addGrabbable("key")
+    r1.addGrabbable("paintbrush")
     # add items to room 1
-    r1.addItem("chair", "It is made of wicker and no one is sitting on it.")
-    r1.addItem("table", "It is made of oak. A golden key rests on it.")
+    r1.addItem("canvas", "A blank canvas. If I had a paint brush I bet I could make a masterpiece.")
+    r1.addItem("mirror", "You look in the mirror. You're frowning :(")
     # add exits to room 2
     r2.addExit("west", r1)
     r2.addExit("south", r4)
@@ -134,6 +135,22 @@ def createRooms():
     r3.addItem("bookshelves", "They are empty. Go figure.")
     r3.addItem("statue", "There is nothing special about it.")
     r3.addItem("desk", "The statue is resting on it. So is a book.")
+    r3.addItem("skeleton", """
+A spooky skeleton is guarding the door.
+      .-.
+     (o.o)
+      |=|
+     __|__
+   //.=|=.\\\\
+  // .=|=. \\\\
+  \\\\ .=|=. //
+   \\\\(_=_)//
+    (:| |:)
+     || ||
+     () ()
+     || ||
+     || ||
+    ==' '==""")
     # add exits to room 4
     r4.addExit("north", r2)
     r4.addExit("west", r3)
@@ -179,9 +196,9 @@ while (True):
     # the game supports a simple language of <verb> <noun>
     # valid verbs are go, look, and take
     # valid nouns depend on the verb
-    action = input("What to do? ")
     # set the user's input to lowercase to make it easier to compare
     # the verb and noun to known values
+    action = input("What to do? ")
     action = action.lower()
     # exit the game if the player wants to leave (supports quit,
     # exit, and bye)
@@ -205,10 +222,12 @@ while (True):
     # check for valid exits in the current room
             for i in range(len(currentRoom.exits)):
     # a valid exit is found
-                if (noun == currentRoom.exits[i]):
+                if currentRoom.name == "Room 1" and "key" not in inventory and noun == "east":
+                    response = "The door seems to be locked"
+                elif (noun == currentRoom.exits[i]):
     # change the current room to the one that is
     # associated with the specified exit
-                    currentRoom = currentRoom.exitLocations[i]
+                    currentRoom = currentRoom.exitLocations[i]              
     # set the response (success)
                     response = "Room changed."
     # no need to check any more exits
