@@ -1,4 +1,5 @@
 from RADeath import death
+import os
 
 
 ######################################################################
@@ -144,14 +145,16 @@ def createRooms():
     r4.addItem("brew_rig", "Gourd is brewing some sort of oatmeal stout on the brew rig. A 6-pack is resting beside it.")
     # set room 1 as the current room at the beginning of the game
     currentRoom = r1
-    
-    
+
     
 ######################################################################
 # START THE GAME!!!
 inventory = [] # nothing in inventory...yet
+response = ""
 createRooms() # add the rooms to the game
 # play forever (well, at least until the player dies or asks to quit)
+
+
 while (True):
 # set the status so the player has situational awareness
 # the status has room and inventory information
@@ -161,8 +164,12 @@ while (True):
     if (currentRoom == None):
         status = "You are dead."
     # display the status
-    print("========================================================")
-    print(status)
+    print(f"""========================================================\n
+{status}\n
+{response}
+
+""")
+
     # if the current room is None (and the player is dead), exit the
     # game
     if (currentRoom == None):
@@ -236,4 +243,6 @@ while (True):
     # no need to check any more grabbable items
                     break
     # display the response
-    print("\n{}".format(response))
+    
+
+    os.system('cls' if os.name == 'nt' else 'clear')
