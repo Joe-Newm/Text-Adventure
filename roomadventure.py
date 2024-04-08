@@ -115,7 +115,7 @@ def createRooms():
     r1.addExit("east", r2) # -> to the east of room 1 is room 2
     r1.addExit("south", r3)
     # add grabbables to room 1
-    r1.addGrabbable("key")
+    #r1.addGrabbable("key")
     r1.addGrabbable("paintbrush")
     # add items to room 1
     r1.addItem("canvas", "A blank canvas. If I had a paint brush I bet I could make a masterpiece.")
@@ -124,8 +124,9 @@ def createRooms():
     r2.addExit("west", r1)
     r2.addExit("south", r4)
     # add items to room 2
-    r2.addItem("rug", "It is nice and Indian. It also needs to be vacuumed.")
-    r2.addItem("fireplace", "It is full of ashes.")
+    r2.addItem("unlit_torch", "the torch on the wall is not lit")
+    r2.addItem("fireplace", "The fire is warm and makes you feel good.")
+    r2.addItem("sword", "The sword is lodged in a stone")
     # add exits to room 3
     r3.addExit("north", r1)
     r3.addExit("east", r4)
@@ -136,7 +137,8 @@ def createRooms():
     r3.addItem("statue", "There is nothing special about it.")
     r3.addItem("desk", "The statue is resting on it. So is a book.")
     r3.addItem("skeleton", """
-A spooky skeleton is guarding the door.
+A spooky skeleton is guarding the door. 
+If only you had a weapon.
       .-.
      (o.o)
       |=|
@@ -157,7 +159,6 @@ A spooky skeleton is guarding the door.
     r4.addExit("south", None) # DEATH!
     # add grabbables to room 4
     r4.addGrabbable("6-pack")
-    11
     # add items to room 4
     r4.addItem("brew_rig", "Gourd is brewing some sort of oatmeal stout on the brew rig. A 6-pack is resting beside it.")
     # set room 1 as the current room at the beginning of the game
@@ -170,6 +171,13 @@ inventory = [] # nothing in inventory...yet
 response = ""
 createRooms() # add the rooms to the game
 # play forever (well, at least until the player dies or asks to quit)
+
+# game variables
+smile = False
+door_lock = True
+
+# item variables to ensure they do not respawn
+key_check = False
 
 
 while (True):
@@ -222,8 +230,19 @@ while (True):
     # check for valid exits in the current room
             for i in range(len(currentRoom.exits)):
     # a valid exit is found
-                if currentRoom.name == "Room 1" and "key" not in inventory and noun == "east":
-                    response = "The door seems to be locked"
+                if currentRoom.name == "Room 1":
+                    if "key" not in inventory and noun == "east" and door_lock == True:
+                        response = "The door seems to be locked."
+                        break
+                    elif "key" in inventory and noun == "east" and door_lock == True:
+                        response = "you unlocked the door. (go east again to go through door)"
+                        door_lock = False
+                        inventory.remove("key")
+                        break
+                    else:
+                        currentRoom = currentRoom.exitLocations[i]
+                        response = "Room changed."
+                        break
                 elif (noun == currentRoom.exits[i]):
     # change the current room to the one that is
     # associated with the specified exit
@@ -238,6 +257,16 @@ while (True):
             response = "I don't see that item."
 # check for valid items in the current room
             for i in range(len(currentRoom.items)):
+                if (currentRoom.name) == "Room 1" and "paintbrush" in inventory and noun == "canvas":
+                    response = currentRoom.itemDescriptions[i] = "You took out your paintbrush and painted the Mona Lisa. It's beautiful. It makes you smile."
+                    inventory.remove("paintbrush")
+                    smile = True
+                if (currentRoom.name) == "Room 1" and smile and noun == "mirror":
+                    response = currentRoom.itemDescriptions[i] = "You look at the mirror and see your beautiful smile. The mirror then shatters revealing a secret compartment. You see a key inside."
+                    if key_check == False:
+                        currentRoom.addGrabbable("key")
+                        key_check = True
+
 # a valid item is found
                 if (noun == currentRoom.items[i]):
 # set the response to the item's description
