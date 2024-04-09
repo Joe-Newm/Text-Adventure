@@ -116,6 +116,7 @@ def createRooms():
     r3 = Room("Room 3")
     r4 = Room("Room 4")
     r5 = Room("Room 5")
+    r6 = Room("the secret room")
     # add exits to room 1
     r1.addExit("east", r2) # -> to the east of room 1 is room 2
     r1.addExit("south", r3)
@@ -132,13 +133,15 @@ def createRooms():
     r2.addItem("unlit_torch", "the torch on the wall is not lit.")
     r2.addItem("fireplace", "The fire is warm and makes you feel good.")
     r2.addItem("sword", "The sword is lodged in a stone.")
+    # add grabbables to room 2
+    r2.addGrabbable("sword")
     # add exits to room 3
     r3.addExit("north", r1)
     r3.addExit("south", r5)
-    # add grabbables to room 3
-    r3.addGrabbable("book")
+    r3.addExit("", r6)
+
     # add items to room 3
-    r3.addItem("bookshelves", "They are empty. Go figure.")
+    r3.addItem("bookshelves", "They're filled up with books, except one spot that looks like a book could fit.")
     r3.addItem("statue", "There is nothing special about it.")
     r3.addItem("desk", "The statue is resting on it. So is a book.")
     r3.addItem("skeleton", """
@@ -158,13 +161,22 @@ If only you had a weapon.
      || ||
      || ||
     ==' '==""")
+    # add grabbables to room 3
+    r3.addGrabbable("book")
     # add exits to room 4
     r4.addExit("north", r2)
     r4.addExit("south", None) # DEATH!
-    # add grabbables to room 4
-    r4.addGrabbable("6-pack")
+    
     # add items to room 4
     r4.addItem("brew_rig", "Gourd is brewing some sort of oatmeal stout on the brew rig. A 6-pack is resting beside it.")
+
+    # add exit to secret room
+    r6.addExit("east", r3)
+
+    # add items to secret room
+    r6.addItem("chest", "You open the chest. Theres an elixer inside")
+    # add grabbable items
+    r6.addGrabbable("elixer")
     # set room 1 as the current room at the beginning of the game
     currentRoom = r1
 
@@ -238,19 +250,9 @@ while (True):
     # check for valid exits in the current room
             for i in range(len(currentRoom.exits)):
     # a valid exit is found
-                if currentRoom.name == "Room 1":
-                    if "key" not in inventory and noun == "east" and door_lock == True:
-                        response = "The door seems to be locked."
-                        break
-                    elif "key" in inventory and noun == "east" and door_lock == True:
-                        response = "you unlocked the door. (go east again to go through door)"
-                        door_lock = False
-                        inventory.remove("key")
-                        break
-                    else:
-                        currentRoom = currentRoom.exitLocations[i]
-                        response = "Room changed."
-                        break
+                if currentRoom.name == "Room 1" and noun == "east" and door_lock == True:
+                    response = "The door seems to be locked."
+                    break
                 elif (noun == currentRoom.exits[i]):
     # change the current room to the one that is
     # associated with the specified exit
@@ -278,9 +280,9 @@ while (True):
                 if (currentRoom.name) == "Room 1" and smile and noun == "canvas":
                     response = currentRoom.itemDescriptions[i] = "The canvas now has the beautiful painting of the Mona Lisa on it. It makes you smile. :)"
                 if (currentRoom.name) == "Room 1" and noun == "drawer_container" and drawer_check == False:
-                    currentRoom.addItem("drawer_1", "You open the drawer. It's empty.")
-                    currentRoom.addItem("drawer_2", "You open the drawer. It's empty.")
-                    currentRoom.addItem("drawer_3", "You open the drawer. There's a paintbrush inside.")
+                    currentRoom.addItem("drawer_1", "You open drawer_1. It's empty.")
+                    currentRoom.addItem("drawer_2", "You open drawer_2. It's empty.")
+                    currentRoom.addItem("drawer_3", "You open drawer_3. There's a paintbrush inside.")
                     drawer_check = True
                 if (currentRoom.name) == "Room 1" and noun == "drawer_3" and drawer_check == True and paintbrush_flag == False:
                     currentRoom.addGrabbable("paintbrush")
@@ -309,11 +311,13 @@ while (True):
                     inventory.append(grabbable)
                     currentRoom.delGrabbable(grabbable)
                     response = "Item grabbed"
-                    currentRoom.removeItem("drawer_1", "You open the drawer. It's empty.")
-                    currentRoom.removeItem("drawer_2", "You open the drawer. It's empty.")
-                    currentRoom.removeItem("drawer_3", "You open the drawer. There's a paintbrush inside.")
+                    currentRoom.removeItem("drawer_1", "You open drawer_1. It's empty.")
+                    currentRoom.removeItem("drawer_2", "You open drawer_2. It's empty.")
+                    currentRoom.removeItem("drawer_3", "You open drawer_3. There's a paintbrush inside.")
                     paintbrush_check = True
                     break
+                if (currentRoom.name == "Room 2" and grabbable == "sword"):
+                    response = "You try as hard as you can to pull the sword from the stone but it won't budge. You are just not strong enough."
     # a valid grabbable item is found
                 elif (noun == grabbable):
     # add the grabbable item to the player's inventory
@@ -335,6 +339,16 @@ while (True):
                         response = "You took out your paintbrush and painted the Mona Lisa on the blank canvas. It's beautiful. It makes you smile. :)"
                         inventory.remove("paintbrush")
                         smile = True
+                    if (currentRoom.name == "Room 1" and noun == "key" and "key" in inventory):
+                        response = "You used the key to unlock the east door!"
+                        inventory.remove("key")
+                        door_lock = False
+                    if (currentRoom.name == "Room 3" and noun == "book" and "book" in inventory):
+                        response = "You put the book in the the missing spot on the bookshelf. The book shelf slides to the right revealing a secret door. (You can now go west.)"
+                        inventory.remove("book")
+                        currentRoom.exits[2] = "west"
+                        
+                        
                     
 
     # display the response
