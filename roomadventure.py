@@ -199,6 +199,8 @@ createRooms() # add the rooms to the game
 smile = False
 door_lock = True
 door_lock2 = True
+run = True
+is_alive = True
 
 # item variables to ensure they do not respawn
 key_check = False
@@ -206,6 +208,8 @@ key_flag = False
 drawer_check = False
 paintbrush_flag = False
 paintbrush_check = False
+skeleton_slain = False
+strong_check = False
 
 # alchemystation function
 def alchemyStation():
@@ -224,8 +228,7 @@ def alchemyStation():
         response = "You didn't do something right. the alchemy station spit all the ingredients back at you."
         return response
 
-
-while (True):
+while (run):
 # set the status so the player has situational awareness
 # the status has room and inventory information
     status = "{}\nYou are carrying: {}\n".format(currentRoom,inventory)
@@ -250,14 +253,39 @@ while (True):
     # valid nouns depend on the verb
     # set the user's input to lowercase to make it easier to compare
     # the verb and noun to known values
-    action = input("What to do? ")
-    action = action.lower()
+    if is_alive == False:
+        print(r"""
+                    The skeleton took your head. :(
+    _,_
+  /7/Y/^\
+  vuVV|C)|                        __ _
+    \|^ /                       .'  Y '>,
+    )| \)                      / _   _   \
+   //)|\\                      )(_) (_)(|}
+  / ^| \ \                     {  4A   } /
+ //^| || \\                     \uLuJJ/\l
+>//||| |\\\|                    |3    p)/
+| ""     7/>l__ _____ ____      /nnm_n//
+L>_   _-< 7/|_-__,__-)\,__)(".  \_>-<_/D
+)D" Y "c)  9)       //V     \_"-._.__G G_c__.-__<"/ ( \
+ | | |  |(|               < "-._"> _.G_.___)\   \7\
+  \"=" // |              (,"-.__.|\ \<.__.-" )   \ \
+   '---'  |              |,"-.__"| \!"-.__.-".\   \ \
+     |_;._/              (_"-.__"'\ \"-.__.-".|    \_\
+     )(" V                \"-.__"'|\ \-.__.-".)     \ \
+        (                  "-.__'"\_\ \.__.-"./      \ l
+         )                  ".__"">>G\ \__.-">        V )
+                                ""  G<\ \_.-"        ./7
+                                     G<\ \          ///
+""")        
+        break
+    else:
+        action = input("What to do? ")
+        action = action.lower()
     # exit the game if the player wants to leave (supports quit,
     # exit, and bye)
     if (action == "quit" or action == "exit" or action == "bye"):
         break
-    if (action == "die"):
-        death()
     # set a default response
     response = "I don't understand. Try verb noun. Valid verbs are go, look, take, and use"
     # split the user input into words (words are separated by spaces)
@@ -280,6 +308,10 @@ while (True):
                 if currentRoom.name == "Room 2" and noun == "south" and door_lock2 == True:
                     response = "The door is covered in spiderwebs and you can't open it."
                     break
+                if currentRoom.name == "Room 3" and noun == "south" and skeleton_slain == False:
+                    is_alive = False
+                    break
+
                 elif (noun == currentRoom.exits[i]):
     # change the current room to the one that is
     # associated with the specified exit
@@ -407,6 +439,7 @@ while (True):
                     inventory.remove("strength_potion")
                 if (currentRoom.name == "Room 3" and noun == "sword" and "sword" in inventory):
                     response = "You take out the sword and slay the skeleton! It didn't stand a chance against your power. You can now go through the southern door"
+                    skeleton_slain = True
                     currentRoom.removeItem("skeleton", """
 A spooky skeleton is guarding the door. 
 If only you had a weapon.
