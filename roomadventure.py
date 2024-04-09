@@ -207,6 +207,23 @@ drawer_check = False
 paintbrush_flag = False
 paintbrush_check = False
 
+# alchemystation function
+def alchemyStation():
+    crystal_tube = input("which tube will you put the crystal in? ")
+    stardust_tube = input("which tube will you put the stardust in? ")
+    elixer_tube = input("which tube will you put the elixer in? ")
+    time = input("how many minutes will you mix the ingredients? ")
+    if crystal_tube == "3" and stardust_tube == "1" and elixer_tube == "2" and time == "2":
+        inventory.append("strength_potion")
+        inventory.remove("crystal")
+        inventory.remove("stardust")
+        inventory.remove("elixer")
+        response = "You did it! You have created a strength potion! It is already in your inventory."
+        return response
+    else:
+        response = "You didn't do something right. the alchemy station spit all the ingredients back at you."
+        return response
+
 
 while (True):
 # set the status so the player has situational awareness
@@ -220,7 +237,6 @@ while (True):
     print(f"""========================================================\n
 {status}\n
 {response}
-
 """)
 
     # if the current room is None (and the player is dead), exit the
@@ -292,7 +308,7 @@ while (True):
                     response = currentRoom.itemDescriptions[i] = "The canvas now has the beautiful painting of the Mona Lisa on it. It makes you smile. :)"
                 if (currentRoom.name) == "Room 1" and noun == "drawer_container" and drawer_check == False:
                     currentRoom.addItem("drawer_1", "You open drawer_1. There's a crystal inside.")
-                    currentRoom.addItem("drawer_2", "You open drawer_2. It's empty.")
+                    currentRoom.addItem("drawer_2", "You open drawer_2. There's an ocarina inside.")
                     currentRoom.addItem("drawer_3", "You open drawer_3. There's a paintbrush inside.")
                     drawer_check = True
                 if (currentRoom.name) == "Room 1" and noun == "drawer_3" and drawer_check == True and paintbrush_flag == False:
@@ -323,12 +339,17 @@ while (True):
                     currentRoom.delGrabbable(grabbable)
                     response = "Item grabbed"
                     currentRoom.removeItem("drawer_1", "You open drawer_1. There's a crystal inside.")
-                    currentRoom.removeItem("drawer_2", "You open drawer_2. It's empty.")
+                    currentRoom.removeItem("drawer_2", "You open drawer_2. There's an ocarina inside.")
                     currentRoom.removeItem("drawer_3", "You open drawer_3. There's a paintbrush inside.")
                     paintbrush_check = True
                     break
-                if (currentRoom.name == "Room 2" and noun == "sword" and grabbable == "sword"):
+                if (currentRoom.name == "Room 2" and noun == "sword" and grabbable == "sword" and strong_check == False):
                     response = "You try as hard as you can to pull the sword from the stone but it won't budge. You are just not strong enough."
+                    break
+                if (currentRoom.name == "Room 2" and noun == "sword" and grabbable == "sword" and strong_check == True):
+                    response = "You grab the sword with only one hand and pull it from the stone effortlessly."
+                    inventory.append(grabbable)
+                    currentRoom.delGrabbable(grabbable)
                     break
                 elif (currentRoom.name == "Room 2" and noun == "unlit_torch" and grabbable == "unlit_torch"):
                     inventory.append(grabbable)
@@ -350,37 +371,60 @@ while (True):
     # set a default response
             response = "can not use this here."
     # check for valid usable items
-            for item in inventory:
-                if (noun == item):
-                    if (currentRoom.name) == "Room 1" and noun == "paintbrush" and "paintbrush" in inventory:
-                        response = "You took out your paintbrush and painted the Mona Lisa on the blank canvas. It's beautiful. It makes you smile. :)"
-                        inventory.remove("paintbrush")
-                        smile = True
-                    if (currentRoom.name == "Room 1" and noun == "key" and "key" in inventory):
-                        response = "You used the key to unlock the east door!"
-                        inventory.remove("key")
-                        door_lock = False
-                    if (currentRoom.name == "Room 3" and noun == "book" and "book" in inventory):
-                        response = "You put the book in the the missing spot on the bookshelf. The book shelf slides to the right revealing a secret door. (You can now go west.)"
-                        inventory.remove("book")
-                        currentRoom.exits[2] = "west"
-                    if (currentRoom.name == "Room 2" and noun == "unlit_torch" and "unlit_torch" in inventory):
-                        response = "You stick the unlit torch into the fireplace. You now have a lit torch!"
-                        inventory.remove("unlit_torch")
-                        inventory.append("lit_torch")
-                    if (currentRoom.name == "Room 2" and noun == "lit_torch" and "lit_torch" in inventory):
-                        response = "You use the torch to burn all the spiderwebs blocking the sothern door. You can now go south."
-                        inventory.remove("lit_torch")
-                        door_lock2 = False
-                    if (currentRoom.name == "Room 4" and noun == "ocarina" and "ocarina" in inventory):
-                        response = "You play a lovely tune on the ocarina. suddenly the mysterious stone crumbles into a substance called stardust"
-                        inventory.remove("ocarina")
-                        currentRoom.items.remove("mysterious_stone")
-                    if (currentRoom.name == "Room 4" and noun == "alchemy_station"):
-                        if ("crystal" not in inventory or "elixer" not in inventory or "stardust" not in inventory):
-                            response = "You do not have the required ingredients. Check the instructions."
-                        else:
-                            pass
+            if (isinstance(noun, str)):
+                if (currentRoom.name) == "Room 1" and noun == "paintbrush" and "paintbrush" in inventory:
+                    response = "You took out your paintbrush and painted the Mona Lisa on the blank canvas. It's beautiful. It makes you smile. :)"
+                    inventory.remove("paintbrush")
+                    smile = True
+                if (currentRoom.name == "Room 1" and noun == "key" and "key" in inventory):
+                    response = "You used the key to unlock the east door!"
+                    inventory.remove("key")
+                    door_lock = False
+                if (currentRoom.name == "Room 3" and noun == "book" and "book" in inventory):
+                    response = "You put the book in the the missing spot on the bookshelf. The book shelf slides to the right revealing a secret door. (You can now go west.)"
+                    inventory.remove("book")
+                    currentRoom.exits[2] = "west"
+                if (currentRoom.name == "Room 2" and noun == "unlit_torch" and "unlit_torch" in inventory):
+                    response = "You stick the unlit torch into the fireplace. You now have a lit torch!"
+                    inventory.remove("unlit_torch")
+                    inventory.append("lit_torch")
+                if (currentRoom.name == "Room 2" and noun == "lit_torch" and "lit_torch" in inventory):
+                    response = "You use the torch to burn all the spiderwebs blocking the sothern door. You can now go south."
+                    inventory.remove("lit_torch")
+                    door_lock2 = False
+                if (currentRoom.name == "Room 4" and noun == "ocarina" and "ocarina" in inventory):
+                    response = "You play a lovely tune on the ocarina. suddenly the mysterious stone crumbles into a substance called stardust"
+                    inventory.remove("ocarina")
+                    currentRoom.items.remove("mysterious_stone")
+                if (currentRoom.name == "Room 4" and noun == "alchemy_station"):
+                    if ("crystal" not in inventory or "elixer" not in inventory or "stardust" not in inventory):
+                        response = "You do not have the required ingredients. Check the instructions."
+                    else:
+                        response = alchemyStation()
+                if (noun == "strength_potion" and "strength_potion" in inventory):
+                    response = "You drank the strength potion. You feel super strong!"
+                    strong_check = True
+                    inventory.remove("strength_potion")
+                if (currentRoom.name == "Room 3" and noun == "sword" and "sword" in inventory):
+                    response = "You take out the sword and slay the skeleton! It didn't stand a chance against your power. You can now go through the southern door"
+                    currentRoom.removeItem("skeleton", """
+A spooky skeleton is guarding the door. 
+If only you had a weapon.
+      .-.
+     (o.o)
+      |=|
+     __|__
+   //.=|=.\\\\
+  // .=|=. \\\\
+  \\\\ .=|=. //
+   \\\\(_=_)//
+    (:| |:)
+     || ||
+     () ()
+     || ||
+     || ||
+    ==' '==""")
+
                         
                         
                         
