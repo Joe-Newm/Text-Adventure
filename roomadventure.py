@@ -191,6 +191,7 @@ createRooms() # add the rooms to the game
 # game variables
 smile = False
 door_lock = True
+door_lock2 = True
 
 # item variables to ensure they do not respawn
 key_check = False
@@ -252,6 +253,9 @@ while (True):
     # a valid exit is found
                 if currentRoom.name == "Room 1" and noun == "east" and door_lock == True:
                     response = "The door seems to be locked."
+                    break
+                if currentRoom.name == "Room 2" and noun == "south" and door_lock2 == True:
+                    response = "The door is covered in spiderwebs and you can't open it."
                     break
                 elif (noun == currentRoom.exits[i]):
     # change the current room to the one that is
@@ -350,6 +354,5 @@ while (True):
                         
                         
                     
-
-    # display the response
+    # clear screen so the response appears to update.
     os.system('cls' if os.name == 'nt' else 'clear')
