@@ -128,6 +128,7 @@ def createRooms():
     r1.addItem("drawer_container", "You look at the drawer container and see three seperate drawers.")
     # add grabbables to room 1
     r1.addGrabbable("crystal")
+    r1.addGrabbable("ocarina")
     # add exits to room 2
     r2.addExit("west", r1)
     r2.addExit("south", r4)
@@ -168,12 +169,14 @@ If only you had a weapon.
     r3.addGrabbable("book")
     # add exits to room 4
     r4.addExit("north", r2)
-    r4.addExit("south", None) # DEATH!
+    r4.addExit("", None) # DEATH!
     
     # add items to room 4
     r4.addItem("alchemy_station", "It's an alchemy station for brewing potions. There's instruction sitting by it.")
     r4.addItem("instructions", "INGREDIENTS: stardust, crystal, elixer \n\nSTEP 1: place crystal in tube 3. \nSTEP 2: place stardust in tube 1. \nSTEP 3: place elixer in tube 2. \nSTEP 4: mix ingredients for 2 minutes.")
-
+    r4.addItem("mysterious_stone", "a strange block shaped stone with musical notes engraved on it is in the corner of the room.")
+    # add grabbables to room 4
+    r4.addGrabbable("stardust")
     # add exit to secret room
     r6.addExit("east", r3)
 
@@ -315,7 +318,7 @@ while (True):
                     currentRoom.delGrabbable(grabbable)
                     response = "Item grabbed."
                     break
-                elif (currentRoom.name == "Room 1" and grabbable == "paintbrush" and "crystal" in inventory or currentRoom.name == "Room 1" and grabbable == "crystal" and "paintbrush" in inventory):
+                elif (currentRoom.name == "Room 1" and grabbable == "paintbrush" and "crystal" in inventory and "ocarina" in inventory or currentRoom.name == "Room 1" and grabbable == "crystal" and "paintbrush" in inventory and "ocarina" in inventory or currentRoom.name == "Room 1" and grabbable == "ocarina" and "paintbrush" in inventory and "crystal" in inventory):
                     inventory.append(grabbable)
                     currentRoom.delGrabbable(grabbable)
                     response = "Item grabbed"
@@ -369,6 +372,15 @@ while (True):
                         response = "You use the torch to burn all the spiderwebs blocking the sothern door. You can now go south."
                         inventory.remove("lit_torch")
                         door_lock2 = False
+                    if (currentRoom.name == "Room 4" and noun == "ocarina" and "ocarina" in inventory):
+                        response = "You play a lovely tune on the ocarina. suddenly the mysterious stone crumbles into a substance called stardust"
+                        inventory.remove("ocarina")
+                        currentRoom.items.remove("mysterious_stone")
+                    if (currentRoom.name == "Room 4" and noun == "alchemy_station"):
+                        if ("crystal" not in inventory or "elixer" not in inventory or "stardust" not in inventory):
+                            response = "You do not have the required ingredients. Check the instructions."
+                        else:
+                            pass
                         
                         
                         
