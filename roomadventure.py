@@ -71,6 +71,10 @@ class Room:
     # append the item and exit to the appropriate lists
         self._items.append(item)
         self._itemDescriptions.append(desc)
+    def removeItem(self, item, desc):
+    # remove the item and desc from the appropriate lists
+        self._items.remove(item)
+        self._itemDescriptions.remove(desc)
     # adds a grabbable item to the room
     # the item is a string (e.g., key)
     def addGrabbable(self, item):
@@ -111,25 +115,26 @@ def createRooms():
     r2 = Room("Room 2")
     r3 = Room("Room 3")
     r4 = Room("Room 4")
+    r5 = Room("Room 5")
     # add exits to room 1
     r1.addExit("east", r2) # -> to the east of room 1 is room 2
     r1.addExit("south", r3)
     # add grabbables to room 1
-    #r1.addGrabbable("key")
-    r1.addGrabbable("paintbrush")
+    
     # add items to room 1
     r1.addItem("canvas", "A blank canvas. If I had a paint brush I bet I could make a masterpiece.")
     r1.addItem("mirror", "You look in the mirror. You're frowning :(")
+    r1.addItem("drawer_container", "You look at the drawer container and see three seperate drawers.")
     # add exits to room 2
     r2.addExit("west", r1)
     r2.addExit("south", r4)
     # add items to room 2
-    r2.addItem("unlit_torch", "the torch on the wall is not lit")
+    r2.addItem("unlit_torch", "the torch on the wall is not lit.")
     r2.addItem("fireplace", "The fire is warm and makes you feel good.")
-    r2.addItem("sword", "The sword is lodged in a stone")
+    r2.addItem("sword", "The sword is lodged in a stone.")
     # add exits to room 3
     r3.addExit("north", r1)
-    r3.addExit("east", r4)
+    r3.addExit("south", r5)
     # add grabbables to room 3
     r3.addGrabbable("book")
     # add items to room 3
@@ -155,7 +160,6 @@ If only you had a weapon.
     ==' '==""")
     # add exits to room 4
     r4.addExit("north", r2)
-    r4.addExit("west", r3)
     r4.addExit("south", None) # DEATH!
     # add grabbables to room 4
     r4.addGrabbable("6-pack")
@@ -178,6 +182,10 @@ door_lock = True
 
 # item variables to ensure they do not respawn
 key_check = False
+key_flag = False
+drawer_check = False
+paintbrush_flag = False
+paintbrush_check = False
 
 
 while (True):
@@ -215,7 +223,7 @@ while (True):
     if (action == "die"):
         death()
     # set a default response
-    response = "I don't understand. Try verb noun. Valid verbs are go, look, and take"
+    response = "I don't understand. Try verb noun. Valid verbs are go, look, take, and use"
     # split the user input into words (words are separated by spaces)
     words = action.split()
     # the game only understands two word inputs
@@ -257,15 +265,26 @@ while (True):
             response = "I don't see that item."
 # check for valid items in the current room
             for i in range(len(currentRoom.items)):
-                if (currentRoom.name) == "Room 1" and "paintbrush" in inventory and noun == "canvas":
-                    response = currentRoom.itemDescriptions[i] = "You took out your paintbrush and painted the Mona Lisa. It's beautiful. It makes you smile."
-                    inventory.remove("paintbrush")
-                    smile = True
-                if (currentRoom.name) == "Room 1" and smile and noun == "mirror":
+                if (currentRoom.name) == "Room 1" and smile and noun == "mirror" and key_check == False:
                     response = currentRoom.itemDescriptions[i] = "You look at the mirror and see your beautiful smile. The mirror then shatters revealing a secret compartment. You see a key inside."
-                    if key_check == False:
+                    if key_check == False and key_flag == False:
                         currentRoom.addGrabbable("key")
-                        key_check = True
+                        # this flag ensures the key is only appended once
+                        key_flag = True        
+                # changes the description for the mirror after you took the key
+                elif (currentRoom.name) == "Room 1" and key_check and noun == "mirror":
+                    response = currentRoom.itemDescriptions[i] = "The mirror is now shattered."
+                # changes the description for the blank canvas after you painted on it
+                if (currentRoom.name) == "Room 1" and smile and noun == "canvas":
+                    response = currentRoom.itemDescriptions[i] = "The canvas now has the beautiful painting of the Mona Lisa on it. It makes you smile. :)"
+                if (currentRoom.name) == "Room 1" and noun == "drawer_container" and drawer_check == False:
+                    currentRoom.addItem("drawer_1", "You open the drawer. It's empty.")
+                    currentRoom.addItem("drawer_2", "You open the drawer. It's empty.")
+                    currentRoom.addItem("drawer_3", "You open the drawer. There's a paintbrush inside.")
+                    drawer_check = True
+                if (currentRoom.name) == "Room 1" and noun == "drawer_3" and drawer_check == True and paintbrush_flag == False:
+                    currentRoom.addGrabbable("paintbrush")
+                    paintbrush_flag = True
 
 # a valid item is found
                 if (noun == currentRoom.items[i]):
@@ -278,11 +297,26 @@ while (True):
     # set a default response
             response = "I don't see that item."
     # check for valid grabbable items in the current room
+            # for the key in room 1.
             for grabbable in currentRoom.grabbables:
+                if (currentRoom.name == "Room 1" and grabbable == "key"):
+                    key_check = True
+                    inventory.append(grabbable)
+                    currentRoom.delGrabbable(grabbable)
+                    response = "Item grabbed."
+                    break
+                elif (currentRoom.name == "Room 1" and grabbable == "paintbrush"):
+                    inventory.append(grabbable)
+                    currentRoom.delGrabbable(grabbable)
+                    response = "Item grabbed"
+                    currentRoom.removeItem("drawer_1", "You open the drawer. It's empty.")
+                    currentRoom.removeItem("drawer_2", "You open the drawer. It's empty.")
+                    currentRoom.removeItem("drawer_3", "You open the drawer. There's a paintbrush inside.")
+                    paintbrush_check = True
+                    break
     # a valid grabbable item is found
-                if (noun == grabbable):
-    # add the grabbable item to the player's
-    # inventory
+                elif (noun == grabbable):
+    # add the grabbable item to the player's inventory
                     inventory.append(grabbable)
     # remove the grabbable item from the room
                     currentRoom.delGrabbable(grabbable)
@@ -290,7 +324,18 @@ while (True):
                     response = "Item grabbed."
     # no need to check any more grabbable items
                     break
-    # display the response
-    
+    # the verb is: use
+        elif (verb == "use"):
+    # set a default response
+            response = "can not use this here."
+    # check for valid usable items
+            for item in inventory:
+                if (noun == item):
+                    if (currentRoom.name) == "Room 1" and noun == "paintbrush" and "paintbrush" in inventory:
+                        response = "You took out your paintbrush and painted the Mona Lisa on the blank canvas. It's beautiful. It makes you smile. :)"
+                        inventory.remove("paintbrush")
+                        smile = True
+                    
 
+    # display the response
     os.system('cls' if os.name == 'nt' else 'clear')
