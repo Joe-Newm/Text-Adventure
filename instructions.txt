@@ -1,2 +1,43 @@
-step 1: 
-go to room 4 
+Room 1: 
+- in this room you find drawer_container, canvas with nothing on it, and a mirror.
+- look at the drawer_container to reveal 3 drawers
+- look in each and take the items from all of them
+- use the paintbrush to paint on the canvas
+- look at the mirror now and it shatters revealing the key
+- use the key to unlock the east door (just type "use key")
+- go south before going east to get an item you need later
+
+Room 3:
+- a skeleton is in this room, if you try to go through the south door the skeleton kills you
+- look at the desk and take the book
+- use the book on the bookshelf to reveal secret room west
+- go west
+- take elixer from chest in the secret room
+- head back to room 1 and then go east to room 2
+
+Room 2:
+- in room 2 you see fireplace torch and sword, if you try to take sword you won't be strong enough to pull it from the stone, the south door is also blocked by spiderwebs.
+- take unlit torch, use it on the fireplace to light it, you now have lit torch
+- use lit torch to burn the spiderwebs blocking the south door
+- go south to room 4
+
+Room 4:
+- in this room you see mysterious stone, alchemy station, and instructions
+- look at the instructions to see what ingredients you need
+- use the ocarina on the mysterious stone and it will turn into the stardust you need 
+- once you have all ingredients type "use alchemy_station"
+- you need to put each ingredient in the correct tube that the instructions told you
+- then mix it for however long the instructions told you
+- you now have a strength potion in your inventory
+- use the strength potion
+- go north to room 2
+
+Room 2:
+- now that you have drank the strength potion you can take the sword 
+- head west to room 1 and then south to room 3
+
+Room 3:
+- use sword to kill the skeleton
+- now you are able to go south
+- you find the treasure and win the game
+
